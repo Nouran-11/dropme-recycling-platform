@@ -1,24 +1,29 @@
 .DEFAULT_GOAL := help
-.PHONY: help up down logs ps build test lint fmt migrate seed backup restore verify-restore deploy-local rollback-local
+.PHONY: help up down logs ps build require-env test lint fmt migrate seed backup restore verify-restore deploy-local rollback-local
+
+COMPOSE ?= docker compose
 
 help: ## List available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
-up: ## Start the full local stack
-	@echo "TODO(phase 2)"
+require-env: ## Fail fast if .env is missing (never auto-created — it holds secrets)
+	@test -f .env || { echo "ERROR: .env is missing. Copy .env.example to .env and set POSTGRES_PASSWORD and API_KEY."; exit 1; }
+
+up: require-env ## Build and start the full local stack
+	$(COMPOSE) up -d --build
 
 down: ## Stop the stack and remove containers
-	@echo "TODO(phase 2)"
+	$(COMPOSE) down --remove-orphans
 
 logs: ## Tail stack logs
-	@echo "TODO(phase 2)"
+	$(COMPOSE) logs -f
 
 ps: ## Show container status
-	@echo "TODO(phase 2)"
+	$(COMPOSE) ps
 
-build: ## Build images
-	@echo "TODO(phase 2)"
+build: require-env ## Build images
+	$(COMPOSE) build
 
 test: ## Run the test suite
 	@echo "TODO(phase 3)"
@@ -29,8 +34,8 @@ lint: ## Run ruff check
 fmt: ## Run ruff format
 	@echo "TODO(phase 3)"
 
-migrate: ## Run alembic upgrade head
-	@echo "TODO(phase 1)"
+migrate: require-env ## Run alembic upgrade head as a one-shot
+	$(COMPOSE) run --rm migrate
 
 seed: ## Seed sample events
 	@echo "TODO(phase 6)"
