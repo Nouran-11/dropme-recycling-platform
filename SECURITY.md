@@ -24,7 +24,7 @@ fixed / accepted / future.
 | 10 | Committed credentials in history | checked clean (Gitleaks, full history) |
 | 11 | Malformed/abusive request bodies reaching the DB | fixed (layered validation) |
 | 12 | API key comparison timing side-channel | fixed (`secrets.compare_digest`) |
-| 13 | No transport encryption | fixed on deployment (Let's Encrypt); accepted locally |
+| 13 | No transport encryption | fixed on deployment / accepted locally |
 | 14 | Application connects to Postgres as a superuser | accepted |
 | 15 | Read endpoints (`GET /events`) are unauthenticated | accepted |
 | 16 | `failure_reason` (internal exception text) exposed on the read API | accepted |
@@ -117,9 +117,11 @@ fixed / accepted / future.
   coarse code and keep detail in logs only.
 - **Single shared API key.** One key authorizes all writers; there is no
   per-machine credential, no rotation, and no revocation of an individual device.
-- **Grafana uses the default `admin` username** (random password on EC2, but
-  `admin`/`admin` locally). It is only ever reachable on `127.0.0.1`, never on
-  the public edge, which is why this is accepted rather than fixed.
+- **Grafana uses the default `admin` username.** The password is randomly
+  generated from the same `openssl rand` generator as the other secrets — on
+  EC2 by the user-data script, and locally in `.env` — so only the username is
+  the default. Grafana is also only ever reachable on `127.0.0.1`, never on the
+  public edge. Accepted (default username) rather than fixed.
 - **No rate limiting and no WAF.** The API will accept unbounded request volume;
   abuse controls are out of scope at this size.
 - **No image signing or provenance.** Images are built and run without cosign
