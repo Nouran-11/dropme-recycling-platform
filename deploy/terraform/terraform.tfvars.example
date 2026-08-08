@@ -6,5 +6,5 @@ key_name = "my-keypair"     # an existing EC2 key pair name in the region
 
 # Optional overrides:
 # region        = "eu-north-1"
-# instance_type = "t3.medium"
+# instance_type = "m7i-flex.large"
 # repo_url      = "https://github.com/Nouran-11/dropme-recycling-platform.git"

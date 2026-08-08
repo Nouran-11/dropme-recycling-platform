@@ -7,7 +7,9 @@ variable "region" {
 variable "instance_type" {
   description = "EC2 instance type"
   type        = string
-  default     = "t3.medium"
+  # t3.medium is not free-tier eligible; RunInstances rejects it on a free-tier
+  # account. m7i-flex.large launches on such accounts.
+  default     = "m7i-flex.large"
 }
 
 variable "my_ip" {
