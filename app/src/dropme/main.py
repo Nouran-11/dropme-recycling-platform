@@ -1,16 +1,24 @@
 import secrets
+import time
 import uuid
 from uuid import UUID
 
 import structlog
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, Response
 from fastapi.responses import JSONResponse
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from dropme.config import get_settings
 from dropme.db import engine, get_session
 from dropme.logging import configure_logging
+from dropme.metrics import (
+    events_created_total,
+    http_request_duration_seconds,
+    http_requests_total,
+    register_collectors,
+)
 from dropme.models import Event, EventStatus
 from dropme.queue import enqueue_process_event, redis_conn
 from dropme.schemas import EventCreate, EventOut
@@ -19,6 +27,10 @@ configure_logging(get_settings().log_level)
 logger = structlog.get_logger()
 
 app = FastAPI(title="Drop Me Recycling API")
+register_collectors()
+
+# Scraped/liveness paths hit on a tight interval — kept out of the access log.
+_UNLOGGED_PATHS = frozenset({"/metrics", "/health"})
 
 
 @app.middleware("http")
@@ -26,16 +38,35 @@ async def request_id_middleware(request: Request, call_next):
     request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
     structlog.contextvars.clear_contextvars()
     structlog.contextvars.bind_contextvars(request_id=request_id)
+
+    start = time.perf_counter()
     response = await call_next(request)
+    elapsed = time.perf_counter() - start
+
     response.headers["X-Request-ID"] = request_id
-    # Method and path only — never the body or headers, which carry the API key.
-    logger.info(
-        "request",
-        method=request.method,
-        path=request.url.path,
-        status_code=response.status_code,
-    )
+
+    path = request.url.path
+    if path != "/metrics":
+        # Label by matched route template, not raw path, to bound cardinality.
+        route = request.scope.get("route")
+        route_label = getattr(route, "path", path)
+        http_requests_total.labels(request.method, route_label, str(response.status_code)).inc()
+        http_request_duration_seconds.labels(request.method, route_label).observe(elapsed)
+
+    if path not in _UNLOGGED_PATHS:
+        # Method and path only — never the body or headers, which carry the API key.
+        logger.info(
+            "request",
+            method=request.method,
+            path=path,
+            status_code=response.status_code,
+        )
     return response
+
+
+@app.get("/metrics", include_in_schema=False)
+def metrics() -> Response:
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
 def require_api_key(x_api_key: str | None = Header(default=None)) -> None:
@@ -64,6 +95,7 @@ def create_event(
     session.add(event)
     session.commit()
     session.refresh(event)
+    events_created_total.labels(material_type=event.material_type.value).inc()
 
     # Enqueue only after the row is durably committed: enqueuing first risks the
     # worker dequeuing an event_id whose commit later failed. A queue outage must
