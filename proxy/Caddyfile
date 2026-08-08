@@ -1,0 +1,27 @@
+{
+	admin off
+	auto_https off
+}
+
+:80 {
+	encode gzip
+
+	# handle_path strips the /api prefix, so /api/events reaches the API as
+	# /events. It is the only externally published entry point.
+	handle_path /api/* {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		reverse_proxy frontend:8080
+	}
+
+	header {
+		-Server
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy no-referrer
+		# style-src allows the page's inline <style>; everything else is same-origin.
+		Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'"
+	}
+}
