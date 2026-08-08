@@ -1,0 +1,43 @@
+flowchart LR
+    operator([Operator / reverse-vending machine])
+
+    subgraph edge[Public edge]
+        caddy["Caddy reverse proxy<br/>:80 / :443 TLS"]
+    end
+
+    subgraph svc[Internal service network]
+        frontend["Frontend<br/>nginx-unprivileged"]
+        api["API<br/>FastAPI"]
+        worker["Worker<br/>RQ"]
+        prometheus["Prometheus"]
+        grafana["Grafana<br/>127.0.0.1 only"]
+        alertmanager["Alertmanager"]
+        alertsink["alert-sink<br/>webhook logger"]
+        backup["backup<br/>pg_dump loop"]
+    end
+
+    subgraph data[Data tier]
+        redis[("Redis<br/>queue")]
+        postgres[("Postgres")]
+    end
+
+    operator -->|HTTPS| caddy
+    caddy -->|"/"| frontend
+    caddy -->|"/api/*"| api
+
+    api -->|"enqueue job"| redis
+    redis -->|"dequeue"| worker
+    api -->|"read / write"| postgres
+    worker -->|"update status"| postgres
+
+    prometheus -->|"scrape /metrics"| api
+    prometheus -->|"scrape :9100"| worker
+    prometheus -->|"alerts"| alertmanager
+    alertmanager -->|"webhook"| alertsink
+    grafana -->|"query"| prometheus
+    backup -->|"pg_dump"| postgres
+
+    classDef edgeBox fill:#e8f0ff,stroke:#4a6fa5;
+    classDef dataBox fill:#fff2e0,stroke:#b5842f;
+    class edge edgeBox;
+    class data dataBox;
