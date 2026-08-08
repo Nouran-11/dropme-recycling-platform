@@ -25,14 +25,14 @@ ps: ## Show container status
 build: require-env ## Build images
 	$(COMPOSE) build
 
-test: ## Run the test suite
-	@echo "TODO(phase 3)"
+test: ## Run the test suite (needs Postgres+Redis on localhost)
+	cd app && uv run pytest -q
 
 lint: ## Run ruff check
-	@echo "TODO(phase 3)"
+	cd app && uv run ruff check .
 
-fmt: ## Run ruff format
-	@echo "TODO(phase 3)"
+fmt: ## Format with ruff
+	cd app && uv run ruff format .
 
 migrate: require-env ## Run alembic upgrade head as a one-shot
 	$(COMPOSE) run --rm migrate
