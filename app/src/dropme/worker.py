@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -51,7 +51,7 @@ def process_event(event_id: str) -> None:
             weight = GRAMS_PER_ITEM[event.material_type] * event.item_count
             event.estimated_weight_g = weight
             event.status = EventStatus.processed
-            event.processed_at = datetime.now(timezone.utc)
+            event.processed_at = datetime.now(UTC)
             event.failure_reason = None
             session.commit()
             log.info("processed", estimated_weight_g=str(weight))
@@ -72,9 +72,7 @@ class HeartbeatWorker(Worker):
     def heartbeat(self, timeout: int | None = None, pipeline=None) -> None:
         super().heartbeat(timeout, pipeline)
         try:
-            self.connection.set(
-                "worker:heartbeat", datetime.now(timezone.utc).isoformat(), ex=60
-            )
+            self.connection.set("worker:heartbeat", datetime.now(UTC).isoformat(), ex=60)
         except redis.exceptions.RedisError:
             self.log.warning("failed to write worker:heartbeat")
 

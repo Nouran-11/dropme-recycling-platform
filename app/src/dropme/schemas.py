@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
 
@@ -30,7 +30,7 @@ class EventCreate(BaseModel):
     def _tz_aware_not_far_future(cls, v: datetime) -> datetime:
         if v.tzinfo is None or v.utcoffset() is None:
             raise ValueError("event_timestamp must be timezone-aware (ISO-8601 with offset)")
-        if v > datetime.now(timezone.utc) + MAX_FUTURE_SKEW:
+        if v > datetime.now(UTC) + MAX_FUTURE_SKEW:
             raise ValueError("event_timestamp must not be more than 24h in the future")
         return v
 

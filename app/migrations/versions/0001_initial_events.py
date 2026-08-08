@@ -39,17 +39,21 @@ def upgrade() -> None:
         sa.Column("material_type", material_type, nullable=False),
         sa.Column("item_count", sa.Integer(), nullable=False),
         sa.Column("event_timestamp", sa.DateTime(timezone=True), nullable=False),
-        sa.Column(
-            "status", event_status, server_default=sa.text("'received'"), nullable=False
-        ),
+        sa.Column("status", event_status, server_default=sa.text("'received'"), nullable=False),
         sa.Column("estimated_weight_g", sa.Numeric(10, 2), nullable=True),
         sa.Column("processed_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("failure_reason", sa.Text(), nullable=True),
         sa.Column(
-            "created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
         ),
         sa.Column(
-            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.CheckConstraint(
@@ -60,9 +64,7 @@ def upgrade() -> None:
         ),
     )
     op.create_index("idx_events_status_created", "events", ["status", "created_at"])
-    op.execute(
-        "CREATE INDEX idx_events_machine_time ON events (machine_id, event_timestamp DESC)"
-    )
+    op.execute("CREATE INDEX idx_events_machine_time ON events (machine_id, event_timestamp DESC)")
 
     op.execute(
         """

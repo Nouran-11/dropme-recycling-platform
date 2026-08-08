@@ -122,9 +122,7 @@ def ready() -> Response:
         failed.append("redis")
 
     if failed:
-        return JSONResponse(
-            status_code=503, content={"status": "not ready", "failed": failed}
-        )
+        return JSONResponse(status_code=503, content={"status": "not ready", "failed": failed})
     return JSONResponse(status_code=200, content={"status": "ready"})
 
 
