@@ -1,0 +1,36 @@
+rule_files:
+  - alerts.yml
+evaluation_interval: 15s
+tests:
+  - interval: 15s
+    input_series:
+      - series: "dropme_oldest_unprocessed_event_age_seconds"
+        values: "200x40"
+      - series: 'up{job="worker", instance="worker:9100"}'
+        values: "0x40"
+      - series: 'http_requests_total{status="500"}'
+        values: "0+10x40"
+      - series: 'http_requests_total{status="200"}'
+        values: "0+10x40"
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: EventProcessingLag
+        exp_alerts:
+          - exp_labels: { severity: critical }
+            exp_annotations:
+              summary: "Events are not being processed (oldest unprocessed > 120s)"
+              description: 'Oldest unprocessed event is 3m 20s old. Diagnosis: check up{job="worker"} — if 0 the worker is down (see WorkerDown); otherwise check dropme_queue_depth and worker logs for stuck jobs. Runbook: RUNBOOK.md#event-processing-lag'
+      - eval_time: 2m
+        alertname: WorkerDown
+        exp_alerts:
+          - exp_labels: { severity: critical, job: worker, instance: "worker:9100" }
+            exp_annotations:
+              summary: "Worker is not being scraped (up == 0)"
+              description: "Prometheus cannot scrape worker:9100 for 1m. The worker process is down or unreachable; events will pile up at 'received'. Runbook: RUNBOOK.md#worker-down"
+      - eval_time: 6m
+        alertname: APIErrorRateHigh
+        exp_alerts:
+          - exp_labels: { severity: warning }
+            exp_annotations:
+              summary: "API 5xx error ratio above 5%"
+              description: "50% of API requests returned 5xx over the last 5m. Check /ready and dropme_dependency_up for a failing dependency. Runbook: RUNBOOK.md#api-errors"
