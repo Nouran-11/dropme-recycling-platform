@@ -1,0 +1,6 @@
+NAME                                   IMAGE                                                                                          COMMAND                  SERVICE    CREATED          STATUS                            PORTS
+dropme-recycling-platform-api-1        dropme-recycling-platform-api                                                                  "uvicorn dropme.main…"   api        11 seconds ago   Up 4 seconds (health: starting)   8000/tcp
+dropme-recycling-platform-frontend-1   dropme-recycling-platform-frontend                                                             "/docker-entrypoint.…"   frontend   11 seconds ago   Up 10 seconds (healthy)           8080/tcp
+dropme-recycling-platform-postgres-1   postgres:16-bookworm@sha256:64154d0babcb1741988719e703419af0382b19953706149f9872fbd0f438efa8   "docker-entrypoint.s…"   postgres   11 seconds ago   Up 10 seconds (healthy)           5432/tcp
+dropme-recycling-platform-redis-1      redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2         "docker-entrypoint.s…"   redis      11 seconds ago   Up 10 seconds (healthy)           6379/tcp
+dropme-recycling-platform-worker-1     dropme-recycling-platform-worker                                                               "python -m dropme.wo…"   worker     11 seconds ago   Up 4 seconds (health: starting)   8000/tcp

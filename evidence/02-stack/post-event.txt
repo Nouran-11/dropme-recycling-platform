@@ -1,0 +1,17 @@
+{"id":"ba7b6914-e836-4295-9922-2d43bd07669c","machine_id":"kiosk-1","material_type":"ALU","item_count":6,"event_timestamp":"2026-08-08T09:00:00Z","status":"received","estimated_weight_g":null,"processed_at":null,"failure_reason":null,"created_at":"2026-08-08T14:42:58.320113Z","updated_at":"2026-08-08T14:42:58.320113Z"}
+HTTP 201 in 0.041289s
+[
+    {
+        "id": "ba7b6914-e836-4295-9922-2d43bd07669c",
+        "machine_id": "kiosk-1",
+        "material_type": "ALU",
+        "item_count": 6,
+        "event_timestamp": "2026-08-08T09:00:00Z",
+        "status": "processed",
+        "estimated_weight_g": "90.00",
+        "processed_at": "2026-08-08T14:42:58.359668Z",
+        "failure_reason": null,
+        "created_at": "2026-08-08T14:42:58.320113Z",
+        "updated_at": "2026-08-08T14:42:58.360093Z"
+    }
+]
