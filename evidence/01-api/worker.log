@@ -1,0 +1,11 @@
+17:08:26 Worker 3d7fb63e50a3468c90ae2c2fde653e02: started with PID 57290, version 2.10.0
+17:08:26 Worker 3d7fb63e50a3468c90ae2c2fde653e02: subscribing to channel rq:pubsub:3d7fb63e50a3468c90ae2c2fde653e02
+17:08:26 *** Listening on events...
+17:08:26 Acquired scheduler lock for events
+17:08:26 Scheduler for events started with PID 57291
+17:08:26 Worker 3d7fb63e50a3468c90ae2c2fde653e02: cleaning registries for queue: events
+17:08:39 events: dropme.worker.process_event('490a1fc0-1825-4a2c-875e-7384a16e275f') (ee4c8e30-646f-436f-b1aa-00db1c6b1281)
+{"event_id": "490a1fc0-1825-4a2c-875e-7384a16e275f", "job_id": "ee4c8e30-646f-436f-b1aa-00db1c6b1281", "estimated_weight_g": "216", "event": "processed", "level": "info", "timestamp": "2026-08-08T14:08:39.530489Z"}
+17:08:39 Successfully completed dropme.worker.process_event('490a1fc0-1825-4a2c-875e-7384a16e275f') job in 0:00:00.032446s on worker 3d7fb63e50a3468c90ae2c2fde653e02
+17:08:39 events: Job OK (ee4c8e30-646f-436f-b1aa-00db1c6b1281)
+17:08:39 Result is kept for 500 seconds

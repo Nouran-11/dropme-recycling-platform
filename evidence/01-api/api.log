@@ -1,0 +1,18 @@
+INFO:     Started server process [57289]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+{"method": "POST", "path": "/events", "status_code": 201, "event": "request", "request_id": "54d71752-a6da-438f-9a1e-632e680c78b2", "level": "info", "timestamp": "2026-08-08T14:08:39.483151Z"}
+INFO:     127.0.0.1:56958 - "POST /events HTTP/1.1" 201 Created
+{"method": "POST", "path": "/events", "status_code": 401, "event": "request", "request_id": "9500b14a-dfc8-4704-9bf3-091b862ade57", "level": "info", "timestamp": "2026-08-08T14:08:39.498690Z"}
+INFO:     127.0.0.1:56963 - "POST /events HTTP/1.1" 401 Unauthorized
+{"method": "POST", "path": "/events", "status_code": 422, "event": "request", "request_id": "1b0b799f-2a9c-41ea-92f9-3444579e184d", "level": "info", "timestamp": "2026-08-08T14:08:39.509444Z"}
+INFO:     127.0.0.1:56966 - "POST /events HTTP/1.1" 422 Unprocessable Entity
+{"method": "GET", "path": "/events", "status_code": 200, "event": "request", "request_id": "35b6f6c1-aff1-491c-acbe-5bb752f8f2a5", "level": "info", "timestamp": "2026-08-08T14:08:42.553497Z"}
+INFO:     127.0.0.1:56968 - "GET /events HTTP/1.1" 200 OK
+{"method": "GET", "path": "/health", "status_code": 200, "event": "request", "request_id": "46ddb727-720b-4f58-84a1-dc7aaa8aa10e", "level": "info", "timestamp": "2026-08-08T14:08:42.628213Z"}
+INFO:     127.0.0.1:56970 - "GET /health HTTP/1.1" 200 OK
+{"method": "GET", "path": "/ready", "status_code": 200, "event": "request", "request_id": "4157672c-5306-4e7f-884b-dc0aa7f2a5d0", "level": "info", "timestamp": "2026-08-08T14:08:42.638736Z"}
+INFO:     127.0.0.1:56972 - "GET /ready HTTP/1.1" 200 OK
+{"method": "GET", "path": "/version", "status_code": 200, "event": "request", "request_id": "75521dde-d063-4493-a36e-faff1124e143", "level": "info", "timestamp": "2026-08-08T14:08:42.646239Z"}
+INFO:     127.0.0.1:56974 - "GET /version HTTP/1.1" 200 OK

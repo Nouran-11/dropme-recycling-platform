@@ -1,0 +1,24 @@
+                                      Table "public.events"
+       Column       |           Type           | Collation | Nullable |         Default          
+--------------------+--------------------------+-----------+----------+--------------------------
+ id                 | uuid                     |           | not null | gen_random_uuid()
+ machine_id         | text                     |           | not null | 
+ material_type      | material_type            |           | not null | 
+ item_count         | integer                  |           | not null | 
+ event_timestamp    | timestamp with time zone |           | not null | 
+ status             | event_status             |           | not null | 'received'::event_status
+ estimated_weight_g | numeric(10,2)            |           |          | 
+ processed_at       | timestamp with time zone |           |          | 
+ failure_reason     | text                     |           |          | 
+ created_at         | timestamp with time zone |           | not null | now()
+ updated_at         | timestamp with time zone |           | not null | now()
+Indexes:
+    "events_pkey" PRIMARY KEY, btree (id)
+    "idx_events_machine_time" btree (machine_id, event_timestamp DESC)
+    "idx_events_status_created" btree (status, created_at)
+Check constraints:
+    "ck_events_item_count_range" CHECK (item_count > 0 AND item_count <= 10000)
+    "ck_events_machine_id_len" CHECK (length(TRIM(BOTH FROM machine_id)) >= 1 AND length(TRIM(BOTH FROM machine_id)) <= 64)
+Triggers:
+    trg_events_updated_at BEFORE UPDATE ON events FOR EACH ROW EXECUTE FUNCTION set_updated_at()
+

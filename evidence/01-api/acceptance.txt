@@ -1,0 +1,43 @@
+=== POST /events (timed) ===
+HTTP/1.1 201 Created
+date: Sat, 08 Aug 2026 14:08:39 GMT
+server: uvicorn
+content-length: 321
+content-type: application/json
+location: /events/490a1fc0-1825-4a2c-875e-7384a16e275f
+x-request-id: 54d71752-a6da-438f-9a1e-632e680c78b2
+
+{"id":"490a1fc0-1825-4a2c-875e-7384a16e275f","machine_id":"RVM-001","material_type":"PET","item_count":12,"event_timestamp":"2026-08-08T14:30:00Z","status":"received","estimated_weight_g":null,"processed_at":null,"failure_reason":null,"created_at":"2026-08-08T14:08:39.467567Z","updated_at":"2026-08-08T14:08:39.467567Z"}
+HTTP 201 in 0.062637s
+
+=== POST without API key ===
+HTTP 401
+
+=== POST invalid body ===
+HTTP 422
+
+=== waiting for worker ===
+
+=== GET /events (after processing) ===
+[
+    {
+        "id": "490a1fc0-1825-4a2c-875e-7384a16e275f",
+        "machine_id": "RVM-001",
+        "material_type": "PET",
+        "item_count": 12,
+        "event_timestamp": "2026-08-08T14:30:00Z",
+        "status": "processed",
+        "estimated_weight_g": "216.00",
+        "processed_at": "2026-08-08T14:08:39.528402Z",
+        "failure_reason": null,
+        "created_at": "2026-08-08T14:08:39.467567Z",
+        "updated_at": "2026-08-08T14:08:39.528170Z"
+    }
+]
+
+=== /health ===
+{"status":"ok"}
+=== /ready ===
+{"status":"ready"}
+=== /version ===
+{"version":"0.0.0-dev","git_sha":"unknown","built_at":"unknown"}
