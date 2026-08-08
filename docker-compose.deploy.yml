@@ -1,0 +1,16 @@
+# Deployment override: layer on top of docker-compose.yml on the EC2 host.
+#   docker compose -f docker-compose.yml -f docker-compose.deploy.yml up -d --build --wait
+# Swaps the local auto_https-off Caddyfile for the public one, publishes 443,
+# and injects the sslip.io hostname.
+services:
+  caddy:
+    ports:
+      - "443:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?set SITE_ADDRESS in .env on the host}
+    volumes:
+      - ./proxy/Caddyfile.deploy:/etc/caddy/Caddyfile:ro
+    healthcheck:
+      # With auto_https, a plain request to 127.0.0.1 does not match the
+      # hostname site and gets redirected, so the local probe is unreliable.
+      disable: true
