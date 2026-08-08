@@ -137,6 +137,28 @@ services:
       start_period: 5s
     restart: unless-stopped
 
+  backup:
+    image: postgres:16-bookworm@sha256:64154d0babcb1741988719e703419af0382b19953706149f9872fbd0f438efa8
+    command: ["bash", "/ops/cron/backup-loop.sh"]
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      PGDATABASE: ${POSTGRES_DB:-dropme}
+      GIT_SHA: ${GIT_SHA:-unknown}
+      BACKUP_INTERVAL: ${BACKUP_INTERVAL:-3600}
+    volumes:
+      - ./ops:/ops:ro
+      - ./backups:/backups
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
   prometheus:
     image: prom/prometheus@sha256:508729e0e2d18e11fd742a5a5ca70e557b940a93948c3c95fd0123a6fd538b69
     volumes:
