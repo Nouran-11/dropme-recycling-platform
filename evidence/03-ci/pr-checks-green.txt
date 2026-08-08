@@ -1,0 +1,5 @@
+build	pass	16s	https://github.com/Nouran-11/dropme-recycling-platform/actions/runs/31265666245/job/93123255985	
+gitleaks	pass	5s	https://github.com/Nouran-11/dropme-recycling-platform/actions/runs/31265666245/job/93123255967	
+lint	pass	10s	https://github.com/Nouran-11/dropme-recycling-platform/actions/runs/31265666245/job/93123255930	
+test	pass	27s	https://github.com/Nouran-11/dropme-recycling-platform/actions/runs/31265666245/job/93123255991	
+trivy-fs	pass	22s	https://github.com/Nouran-11/dropme-recycling-platform/actions/runs/31265666245/job/93123255992	
