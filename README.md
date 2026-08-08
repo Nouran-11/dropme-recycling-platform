@@ -144,7 +144,7 @@ tag) is future work.
 
 ## Deploying to AWS and rolling back
 
-A single `t3.medium` runs the identical compose stack, provisioned by Terraform
+A single `m7i-flex.large` runs the identical compose stack, provisioned by Terraform
 in `deploy/terraform/` (default VPC, Elastic IP, 30 GB gp3, security group
 opening 80/443 to the world and 22 to your IP only). The instance installs
 Docker, clones this repo, generates `.env`, and runs the stack with the
