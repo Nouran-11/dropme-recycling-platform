@@ -1,0 +1,47 @@
+#!/bin/bash
+# No `set -x`: secrets are generated below and must not land in cloud-init logs.
+set -euo pipefail
+export DEBIAN_FRONTEND=noninteractive
+APT="apt-get -o DPkg::Lock::Timeout=180 -y"
+
+# --- Docker Engine + compose plugin (official repo) ---
+$APT update
+$APT install ca-certificates curl git openssl
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $${VERSION_CODENAME}) stable" \
+  > /etc/apt/sources.list.d/docker.list
+$APT update
+$APT install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+systemctl enable --now docker
+
+# --- Application source ---
+install -d -m 0755 /opt
+git clone ${repo_url} /opt/dropme
+cd /opt/dropme
+
+# --- Secrets: generated here, never in tfvars / state / Git ---
+POSTGRES_PASSWORD="$(openssl rand -hex 24)"
+API_KEY="$(openssl rand -hex 24)"
+GF_PASSWORD="$(openssl rand -hex 16)"
+GIT_SHA="$(git rev-parse --short HEAD)"
+
+umask 077
+cat > .env <<EOF
+POSTGRES_USER=dropme
+POSTGRES_PASSWORD=$${POSTGRES_PASSWORD}
+POSTGRES_DB=dropme
+DATABASE_URL=postgresql+psycopg://dropme:$${POSTGRES_PASSWORD}@postgres:5432/dropme
+REDIS_URL=redis://redis:6379/0
+API_KEY=$${API_KEY}
+VERSION=0.1.0
+GIT_SHA=$${GIT_SHA}
+BUILT_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+GF_SECURITY_ADMIN_PASSWORD=$${GF_PASSWORD}
+BACKUP_INTERVAL=3600
+SITE_ADDRESS=${site_address}
+EOF
+
+# --- Build and start the stack (auto_https via the deploy override) ---
+docker compose -f docker-compose.yml -f docker-compose.deploy.yml up -d --build --wait

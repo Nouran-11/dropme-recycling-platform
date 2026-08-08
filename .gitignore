@@ -30,6 +30,12 @@ venv/
 .coverage
 htmlcov/
 
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+
 # OS
 .DS_Store
 NOTES.md
