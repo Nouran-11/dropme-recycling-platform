@@ -10,8 +10,8 @@ help: ## List available targets
 require-env: ## Fail fast if .env is missing (never auto-created — it holds secrets)
 	@test -f .env || { echo "ERROR: .env is missing. Copy .env.example to .env and set POSTGRES_PASSWORD and API_KEY."; exit 1; }
 
-up: require-env ## Build and start the full local stack
-	$(COMPOSE) up -d --build
+up: require-env ## Build and start the full local stack, blocking until healthy
+	$(COMPOSE) up -d --build --wait
 
 down: ## Stop the stack and remove containers
 	$(COMPOSE) down --remove-orphans
