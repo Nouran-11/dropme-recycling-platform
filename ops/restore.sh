@@ -17,7 +17,9 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Default to the newest dump if a file was not given.
+# Default to the newest dump if a file was not given. Filenames are controlled
+# (timestamped, no spaces), so ls -1t is safe here.
+# shellcheck disable=SC2012
 if [[ -z "$dump" ]]; then
   dump="$(ls -1t "$BACKUP_DIR"/dropme_*.dump.gz 2>/dev/null | head -1 || true)"
 fi
