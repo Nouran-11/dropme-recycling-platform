@@ -108,13 +108,39 @@ make seed                          # insert ~200 sample events (stack must be up
 One image serves both the API and the worker (different `command`), so there is
 one thing to build, scan, version, and roll back — see `app/Dockerfile`
 (multi-stage, non-root UID 10001, base images pinned by digest). The frontend is
-a separate static-nginx image. Build args `VERSION`/`GIT_SHA`/`BUILT_AT` flow to
-`GET /version` and the `dropme_build_info` gauge, so "which build is running" is
-always answerable. Deployed artifacts are never tagged `:latest`.
+a separate static-nginx image. Build args `VERSION`/`GIT_SHA`/`BUILT_AT` are
+baked into the image at build time.
 
 ```bash
-make build          # docker compose build
+make build          # docker compose build (local)
 ```
+
+**Tagging scheme.** The three workflows map to the three kinds of change:
+
+| Trigger | Workflow | Image action |
+|---|---|---|
+| Pull request | `pr.yml` | image is **built to prove it compiles, never pushed** |
+| Push to `main` | `main.yml` | multi-arch build pushed to GHCR as `sha-<short>` and `main` |
+| Tag `v*` | `release.yml` | multi-arch build pushed as `v<version>` and `sha-<short>`, plus a GitHub Release |
+
+Images are **never tagged `:latest`**. A moving `:latest` makes "which version
+is running?" unanswerable — two hosts pulling `:latest` a day apart can run
+different code with no way to tell. Every pushed image instead carries an
+immutable `sha-<short>` (and, for releases, `v<version>`), so a tag names exactly
+one build.
+
+**Determining the running version.** `GET /version` returns `{version, git_sha,
+built_at}`, and the same identity is exposed as the Prometheus gauge
+`dropme_build_info{version, git_sha}` (visible on the "Is it up?" dashboard row).
+That is what lets you answer "did failures begin after a specific release?".
+
+**Honest caveat about the deployment.** The EC2 instance currently **builds from
+source on the host** (see `deploy/terraform/user_data.sh.tftpl`); it does **not**
+pull these GHCR images. Its generated `.env` sets a hardcoded `VERSION=0.1.0`
+alongside the real deployed commit, so `GET /version` on the host reports
+`version=0.1.0` with the actual `git_sha` — not a `v<version>` tied to a release.
+Making the deployment pull the released image (so `/version` matches a release
+tag) is future work.
 
 ## Deploying to AWS and rolling back
 

@@ -1,0 +1,5 @@
+completed	success	ci: add tag-driven release pipeline with GHCR publish	release	v1.0.0	push	31284088484	2m22s	2026-08-08T23:29:30Z
+completed	success	ci: add tag-driven release pipeline with GHCR publish	main	main	push	31284086108	1m52s	2026-08-08T23:29:26Z
+completed	success	ci: add main-branch integration and GHCR multi-arch push	main	main	push	31283620251	1m38s	2026-08-08T23:16:54Z
+completed	success	Add pull request quality gates	PR	ci/pull-request-checks	pull_request	31265666245	36s	2026-08-08T15:55:10Z
+completed	failure	Add pull request quality gates	PR	ci/pull-request-checks	pull_request	31265591044	35s	2026-08-08T15:53:23Z

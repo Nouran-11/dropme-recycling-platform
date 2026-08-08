@@ -1,0 +1,17 @@
+title:	v1.0.0
+tag:	v1.0.0
+draft:	false
+prerelease:	false
+immutable:	false
+author:	github-actions[bot]
+created:	2026-08-08T23:29:21Z
+published:	2026-08-08T23:31:37Z
+url:	https://github.com/Nouran-11/dropme-recycling-platform/releases/tag/v1.0.0
+--
+## What's Changed
+* Add pull request quality gates by @Nouran-11 in https://github.com/Nouran-11/dropme-recycling-platform/pull/1
+
+## New Contributors
+* @Nouran-11 made their first contribution in https://github.com/Nouran-11/dropme-recycling-platform/pull/1
+
+**Full Changelog**: https://github.com/Nouran-11/dropme-recycling-platform/commits/v1.0.0
