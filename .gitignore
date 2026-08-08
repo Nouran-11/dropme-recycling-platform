@@ -1,0 +1,34 @@
+# Editors / IDE
+.idea/
+.vscode/
+
+# Local planning + agent instructions (not part of the deliverable)
+DROPME_BUILD_PLAN.md
+CLAUDE.md
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Backups / dumps
+backups/
+*.dump
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
