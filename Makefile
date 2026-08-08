@@ -37,17 +37,17 @@ fmt: ## Format with ruff
 migrate: require-env ## Run alembic upgrade head as a one-shot
 	$(COMPOSE) run --rm migrate
 
-seed: ## Seed sample events
-	@echo "TODO(phase 6)"
+seed: ## Seed ~200 sample events into the running stack
+	$(COMPOSE) exec -T postgres sh -c 'psql -v ON_ERROR_STOP=1 -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"' < ops/seed.sql
 
-backup: ## Create a verified database backup
-	@echo "TODO(phase 6)"
+backup: ## Create a verified database backup (stack must be up)
+	$(COMPOSE) exec -T backup bash /ops/backup.sh
 
-restore: ## Restore into the scratch database
-	@echo "TODO(phase 6)"
+restore: ## Restore the newest backup into the scratch database
+	$(COMPOSE) exec -T backup bash /ops/restore.sh
 
-verify-restore: ## Compare source vs restored database
-	@echo "TODO(phase 6)"
+verify-restore: ## Compare source vs restored scratch database (PASS/FAIL)
+	$(COMPOSE) exec -T backup bash /ops/verify_restore.sh
 
 deploy-local: ## Deploy to local k3d cluster
 	@echo "TODO(phase 7)"

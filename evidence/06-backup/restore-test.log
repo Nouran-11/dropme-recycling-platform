@@ -1,0 +1,52 @@
+=== restore test run by Nouran, Sat Aug  8 20:52:53 UTC 2026 ===
+docker compose exec -T postgres sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < ops/seed.sql
+INSERT 0 200
+docker compose exec -T backup bash /ops/backup.sh
+[backup] dumping database 'dropme' -> /backups/dropme_20260808T205253Z_local.dump
+[backup] verifying archive is readable (pg_restore --list)
+[backup] compressing
+[backup] verifying gzip integrity
+[backup] pruning dumps older than 7 days
+[backup] OK: /backups/dropme_20260808T205253Z_local.dump.gz (8.0K)
+docker compose exec -T backup bash /ops/restore.sh
+[restore] recreating scratch database 'dropme_restore_test'
+NOTICE:  database "dropme_restore_test" does not exist, skipping
+DROP DATABASE
+CREATE DATABASE
+[restore] restoring /backups/dropme_20260808T205253Z_local.dump.gz into 'dropme_restore_test'
+[restore] OK: restored 'dropme_restore_test' from /backups/dropme_20260808T205253Z_local.dump.gz
+docker compose exec -T backup bash /ops/verify_restore.sh
+[verify] source='dropme'  restored='dropme_restore_test'
+field        source                   restored                
+count        200                      200                     
+min(created) 2026-08-08 20:52:53.812035+00 2026-08-08 20:52:53.812035+00
+max(created) 2026-08-08 20:52:53.812035+00 2026-08-08 20:52:53.812035+00
+md5(ids)     f7574702956c770c…      f7574702956c770c…     
+[verify] PASS
+=== negative test: delete rows from scratch, expect FAIL ===
+DELETE 60
+docker compose exec -T backup bash /ops/verify_restore.sh
+[verify] source='dropme'  restored='dropme_restore_test'
+field        source                   restored                
+count        200                      140                     
+min(created) 2026-08-08 20:52:53.812035+00 2026-08-08 20:52:53.812035+00
+max(created) 2026-08-08 20:52:53.812035+00 2026-08-08 20:52:53.812035+00
+md5(ids)     f7574702956c770c…      bc6d787c2a5d90d0…     
+[verify] FAIL
+make: *** [verify-restore] Error 1
+verify correctly exited non-zero
+=== re-restore, expect PASS ===
+docker compose exec -T backup bash /ops/restore.sh
+[restore] recreating scratch database 'dropme_restore_test'
+DROP DATABASE
+CREATE DATABASE
+[restore] restoring /backups/dropme_20260808T205253Z_local.dump.gz into 'dropme_restore_test'
+[restore] OK: restored 'dropme_restore_test' from /backups/dropme_20260808T205253Z_local.dump.gz
+docker compose exec -T backup bash /ops/verify_restore.sh
+[verify] source='dropme'  restored='dropme_restore_test'
+field        source                   restored                
+count        200                      200                     
+min(created) 2026-08-08 20:52:53.812035+00 2026-08-08 20:52:53.812035+00
+max(created) 2026-08-08 20:52:53.812035+00 2026-08-08 20:52:53.812035+00
+md5(ids)     f7574702956c770c…      f7574702956c770c…     
+[verify] PASS
