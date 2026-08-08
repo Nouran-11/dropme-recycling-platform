@@ -79,7 +79,7 @@ services:
     build:
       context: .
       dockerfile: app/Dockerfile
-    command: ["python", "-m", "dropme.worker"]
+    command: ["dropme-worker"]
     environment: *app-env
     <<: *hardening
     depends_on:
