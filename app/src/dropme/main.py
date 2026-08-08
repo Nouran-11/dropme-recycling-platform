@@ -1,21 +1,41 @@
 import secrets
+import uuid
 from uuid import UUID
 
 import structlog
-from fastapi import Depends, FastAPI, Header, HTTPException, Query, Response
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, Response
 from fastapi.responses import JSONResponse
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from dropme.config import get_settings
 from dropme.db import engine, get_session
+from dropme.logging import configure_logging
 from dropme.models import Event, EventStatus
 from dropme.queue import enqueue_process_event, redis_conn
 from dropme.schemas import EventCreate, EventOut
 
+configure_logging(get_settings().log_level)
 logger = structlog.get_logger()
 
 app = FastAPI(title="Drop Me Recycling API")
+
+
+@app.middleware("http")
+async def request_id_middleware(request: Request, call_next):
+    request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+    structlog.contextvars.clear_contextvars()
+    structlog.contextvars.bind_contextvars(request_id=request_id)
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = request_id
+    # Method and path only — never the body or headers, which carry the API key.
+    logger.info(
+        "request",
+        method=request.method,
+        path=request.url.path,
+        status_code=response.status_code,
+    )
+    return response
 
 
 def require_api_key(x_api_key: str | None = Header(default=None)) -> None:

@@ -7,7 +7,9 @@ import structlog
 from rq import Worker
 from rq.job import get_current_job
 
+from dropme.config import get_settings
 from dropme.db import SessionLocal
+from dropme.logging import configure_logging
 from dropme.models import Event, EventStatus, MaterialType
 from dropme.queue import event_queue, redis_conn
 
@@ -78,6 +80,7 @@ class HeartbeatWorker(Worker):
 
 
 def main() -> None:
+    configure_logging(get_settings().log_level)
     worker = HeartbeatWorker([event_queue], connection=redis_conn)
     worker.worker_ttl = WORKER_TTL_SECONDS
     worker.work(with_scheduler=True)
